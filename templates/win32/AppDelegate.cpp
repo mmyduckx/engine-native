@@ -10,59 +10,59 @@
 #include "platform/win32/View-win32.h"
 
 namespace {
-std::weak_ptr<cc::View> gView;
-/**
-    @brief  This function changes the PVRFrame show/hide setting in register.
-    @param  bEnable If true show the PVRFrame window, otherwise hide.
-    */
-void PVRFrameEnableControlWindow(bool bEnable) {
-    HKEY hKey = 0;
+    std::weak_ptr<cc::View> gView;
+    /**
+        @brief  This function changes the PVRFrame show/hide setting in register.
+        @param  bEnable If true show the PVRFrame window, otherwise hide.
+        */
+    void PVRFrameEnableControlWindow(bool bEnable) {
+        HKEY hKey = 0;
 
-    // Open PVRFrame control key, if not exist create it.
-    if (ERROR_SUCCESS != RegCreateKeyExW(HKEY_CURRENT_USER,
-                                         L"Software\\Imagination Technologies\\PVRVFRame\\STARTUP\\",
-                                         0,
-                                         0,
-                                         REG_OPTION_NON_VOLATILE,
-                                         KEY_ALL_ACCESS,
-                                         0,
-                                         &hKey,
-                                         nullptr)) {
-        return;
+        // Open PVRFrame control key, if not exist create it.
+        if (ERROR_SUCCESS != RegCreateKeyExW(HKEY_CURRENT_USER,
+                                            L"Software\\Imagination Technologies\\PVRVFRame\\STARTUP\\",
+                                            0,
+                                            0,
+                                            REG_OPTION_NON_VOLATILE,
+                                            KEY_ALL_ACCESS,
+                                            0,
+                                            &hKey,
+                                            nullptr)) {
+            return;
+        }
+
+        const WCHAR* wszValue        = L"hide_gui";
+        const WCHAR* wszNewData      = (bEnable) ? L"NO" : L"YES";
+        WCHAR        wszOldData[256] = {0};
+        DWORD        dwSize          = sizeof(wszOldData);
+        LSTATUS      status          = RegQueryValueExW(hKey, wszValue, 0, nullptr, (LPBYTE)wszOldData, &dwSize);
+        if (ERROR_FILE_NOT_FOUND == status               // the key not exist
+            || (ERROR_SUCCESS == status                  // or the hide_gui value is exist
+                && 0 != wcscmp(wszNewData, wszOldData))) // but new data and old data not equal
+        {
+            dwSize = sizeof(WCHAR) * (wcslen(wszNewData) + 1);
+            RegSetValueEx(hKey, wszValue, 0, REG_SZ, (const BYTE*)wszNewData, dwSize);
+        }
+
+        RegCloseKey(hKey);
     }
 
-    const WCHAR* wszValue        = L"hide_gui";
-    const WCHAR* wszNewData      = (bEnable) ? L"NO" : L"YES";
-    WCHAR        wszOldData[256] = {0};
-    DWORD        dwSize          = sizeof(wszOldData);
-    LSTATUS      status          = RegQueryValueExW(hKey, wszValue, 0, nullptr, (LPBYTE)wszOldData, &dwSize);
-    if (ERROR_FILE_NOT_FOUND == status               // the key not exist
-        || (ERROR_SUCCESS == status                  // or the hide_gui value is exist
-            && 0 != wcscmp(wszNewData, wszOldData))) // but new data and old data not equal
-    {
-        dwSize = sizeof(WCHAR) * (wcslen(wszNewData) + 1);
-        RegSetValueEx(hKey, wszValue, 0, REG_SZ, (const BYTE*)wszNewData, dwSize);
+    bool setCanvasCallback(se::Object* global) {
+        std::stringstream ss;
+        se::ScriptEngine* se              = se::ScriptEngine::getInstance();
+        auto              view            = gView.lock();
+        auto              handler         = view->getWindowHandler();
+        auto              viewSize        = view->getViewSize();
+        char              commandBuf[200] = {0};
+        ss << "window.innerWidth = " << viewSize[0] << "; "
+        << "window.innerHeight = " << viewSize[1] << "; "
+        << "window.windowHandler = "
+        << reinterpret_cast<intptr_t>(handler)
+        << ";";
+
+        se->evalString(ss.str().c_str());
+        return true;
     }
-
-    RegCloseKey(hKey);
-}
-
-bool setCanvasCallback(se::Object* global) {
-    std::stringstream ss;
-    se::ScriptEngine* se              = se::ScriptEngine::getInstance();
-    auto              view            = gView.lock();
-    auto              handler         = view->getWindowHandler();
-    auto              viewSize        = view->getViewSize();
-    char              commandBuf[200] = {0};
-    ss << "window.innerWidth = " << viewSize[0] << "; "
-       << "window.innerHeight = " << viewSize[1] << "; "
-       << "window.windowHandler = "
-       << reinterpret_cast<intptr_t>(handler)
-       << ";";
-
-    se->evalString(ss.str().c_str());
-    return true;
-}
 } // namespace
 
 //exported function

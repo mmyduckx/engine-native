@@ -38,7 +38,6 @@
 
 namespace cc {
 void Application::restartVM() {
-
     cc::EventDispatcher::dispatchRestartVM();
 
     auto *scriptEngine = se::ScriptEngine::getInstance();
@@ -52,8 +51,8 @@ void Application::restartVM() {
 #endif
     cc::network::HttpClient::destroyInstance();
 
-    _scheduler->removeAllFunctionsToBePerformedInCocosThread();
-    _scheduler->unscheduleAll();
+    scheduler->removeAllFunctionsToBePerformedInCocosThread();
+    scheduler->unscheduleAll();
 
     scriptEngine->cleanup();
     cc::EventDispatcher::destroy();
@@ -65,7 +64,6 @@ void Application::restartVM() {
 }
 
 void Application::tick() {
-
     if (_needRestart) {
         restartVM();
         _needRestart = false;
@@ -73,8 +71,8 @@ void Application::tick() {
 
     static std::chrono::steady_clock::time_point prevTime;
     static std::chrono::steady_clock::time_point now;
-    static float dt = 0.f;
-    static double dtNS = NANOSECONDS_60FPS;
+    static float                                 dt   = 0.F;
+    static double                                dtNS = NANOSECONDS_60FPS;
 
     ++_totalFrames;
 
@@ -89,7 +87,7 @@ void Application::tick() {
 
     prevTime = std::chrono::steady_clock::now();
 
-    _scheduler->update(dt);
+    scheduler->update(dt);
     cc::EventDispatcher::dispatchTickEvent(dt);
 
     AutoreleasePool *currentPool = PoolManager::getInstance()->getCurrentPool();
@@ -97,9 +95,9 @@ void Application::tick() {
         currentPool->clear();
     }
 
-    now = std::chrono::steady_clock::now();
+    now  = std::chrono::steady_clock::now();
     dtNS = dtNS * 0.1 + 0.9 * std::chrono::duration_cast<std::chrono::nanoseconds>(now - prevTime).count();
-    dt = (float)dtNS / NANOSECONDS_PER_SECOND;
+    dt   = static_cast<float>(dtNS) / NANOSECONDS_PER_SECOND;
 }
 
 } // namespace cc

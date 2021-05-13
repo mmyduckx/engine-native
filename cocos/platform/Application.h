@@ -26,15 +26,15 @@
 
 #pragma once
 
-#include <string>
 #include <memory>
+#include <string>
 #include <thread> // // std::this_thread::sleep_for
 #include "base/Macros.h"
 
-#include "bindings/event/EventDispatcher.h"
-#include "base/Scheduler.h"
 #include "base/AutoreleasePool.h"
+#include "base/Scheduler.h"
 #include "base/TypeDef.h"
+#include "bindings/event/EventDispatcher.h"
 #include "math/Vec2.h"
 
 #define NANOSECONDS_PER_SECOND 1000000000
@@ -83,7 +83,7 @@ public:
     };
 
     // This class is useful for internal usage.
-    static Application *getInstance() { return _instance; }
+    static Application *getInstance() { return instance; }
 
     Application(int width, int height);
     virtual ~Application();
@@ -91,6 +91,7 @@ public:
     virtual bool init();
     virtual void onPause();
     virtual void onResume();
+    virtual void onClose();
 
     void restart() { _needRestart = true; }
 
@@ -98,7 +99,7 @@ public:
 
     void restartVM();
 
-    inline std::shared_ptr<Scheduler> getScheduler() const { return _scheduler; }
+    static inline std::shared_ptr<Scheduler> getScheduler() { return scheduler; }
 
     /**
      * @brief Sets the preferred frame rate for main loop callback.
@@ -117,24 +118,24 @@ public:
      @brief Get current language config.
      @return Current language config.
      */
-    LanguageType getCurrentLanguage() const;
+    static LanguageType getCurrentLanguage();
 
     /**
      @brief Get current language iso 639-1 code.
      @return Current language iso 639-1 code.
      */
-    std::string getCurrentLanguageCode() const;
+    static std::string getCurrentLanguageCode();
 
     /**
      @brief Get current display stats.
      @return bool, is displaying stats or not.
      */
-    bool isDisplayStats();
+    static bool isDisplayStats();
 
     /**
      @brief set display stats information.
      */
-    void setDisplayStats(bool isShow);
+    static void setDisplayStats(bool isShow);
 
     /**
      @brief enable/disable(lock) the cursor, default is enabled
@@ -144,30 +145,30 @@ public:
     /**
      @brief Get target platform.
      */
-    Platform getPlatform() const;
+    static Platform getPlatform();
 
     /**
      @brief Open url in default browser.
      @param String with url to open.
      @return True if the resource located by the URL was successfully opened; otherwise false.
      */
-    bool openURL(const std::string &url);
+    static bool openURL(const std::string &url);
 
-    void copyTextToClipboard(const std::string &text);
+    static void copyTextToClipboard(const std::string &text);
 
-    std::string getSystemVersion();
+    static std::string getSystemVersion();
 
     // return size in logical pixel unit.
     inline const cc::Vec2 &getViewLogicalSize() const { return _viewLogicalSize; }
 
 private:
-    static Application *_instance;
-    static std::shared_ptr<Scheduler> _scheduler;
-    int _fps = 60;
-    long _prefererredNanosecondsPerFrame = NANOSECONDS_60FPS;
-    uint _totalFrames = 0;
-    cc::Vec2 _viewLogicalSize;
-    bool _needRestart = false;
+    static Application *              instance;
+    static std::shared_ptr<Scheduler> scheduler;
+    int                               _fps                            = 60;
+    long                              _prefererredNanosecondsPerFrame = NANOSECONDS_60FPS;
+    uint                              _totalFrames                    = 0;
+    cc::Vec2                          _viewLogicalSize;
+    bool                              _needRestart = false;
 };
 
 // end of platform group

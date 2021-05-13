@@ -28,6 +28,12 @@
 #include "platform/Application.h"
 #include "platform/StdC.h" // need it to include Windows.h
 
+#include <MMSystem.h>
+#include <shellapi.h>
+#include <algorithm>
+#include <array>
+#include <memory>
+#include <sstream>
 #include "audio/include/AudioEngine.h"
 #include "base/AutoreleasePool.h"
 #include "base/Scheduler.h"
@@ -35,12 +41,6 @@
 #include "cocos/bindings/jswrapper/SeApi.h"
 #include "platform/FileUtils.h"
 #include "platform/win32/View-win32.h"
-#include <MMSystem.h>
-#include <algorithm>
-#include <array>
-#include <memory>
-#include <shellapi.h>
-#include <sstream>
 
 #include "pipeline/Define.h"
 #include "pipeline/RenderPipeline.h"
@@ -50,12 +50,12 @@ extern std::shared_ptr<cc::View> cc_get_application_view();
 
 namespace cc {
 
-Application *              Application::_instance  = nullptr;
-std::shared_ptr<Scheduler> Application::_scheduler = nullptr;
+Application *              Application::instance  = nullptr;
+std::shared_ptr<Scheduler> Application::scheduler = nullptr;
 
 Application::Application(int width, int height) {
-    Application::_instance = this;
-    _scheduler             = std::make_shared<Scheduler>();
+    Application::instance = this;
+    scheduler             = std::make_shared<Scheduler>();
 
     FileUtils::getInstance()->addSearchPath("Resources", true);
 
@@ -64,7 +64,6 @@ Application::Application(int width, int height) {
 }
 
 Application::~Application() {
-
 #if USE_AUDIO
     AudioEngine::end();
 #endif
@@ -76,7 +75,7 @@ Application::~Application() {
 
     gfx::DeviceManager::destroy();
 
-    Application::_instance = nullptr;
+    Application::instance = nullptr;
 }
 
 bool Application::init() {
@@ -90,7 +89,7 @@ bool Application::init() {
     auto viewSize = view->getViewSize();
 
     gfx::DeviceInfo deviceInfo;
-    deviceInfo.windowHandle       = (uintptr_t)view->getWindowHandler();
+    deviceInfo.windowHandle       = reinterpret_cast<uintptr_t>(view->getWindowHandler());
     deviceInfo.width              = viewSize[0];
     deviceInfo.height             = viewSize[1];
     deviceInfo.nativeWidth        = viewSize[0];
@@ -110,7 +109,7 @@ void Application::setPreferredFramesPerSecond(int fps) {
     _prefererredNanosecondsPerFrame = (long)(1.0 / _fps * NANOSECONDS_PER_SECOND);
 }
 
-Application::LanguageType Application::getCurrentLanguage() const {
+Application::LanguageType Application::getCurrentLanguage() {
     LanguageType ret = LanguageType::ENGLISH;
 
     LCID           localeID          = GetUserDefaultLCID();
@@ -179,7 +178,7 @@ Application::LanguageType Application::getCurrentLanguage() const {
     return ret;
 }
 
-std::string Application::getCurrentLanguageCode() const {
+std::string Application::getCurrentLanguageCode() {
     LANGID     lid       = GetUserDefaultUILanguage();
     const LCID locale_id = MAKELCID(lid, SORT_DEFAULT);
     int        length    = GetLocaleInfoA(locale_id, LOCALE_SISO639LANGNAME, nullptr, 0);
@@ -211,7 +210,7 @@ void Application::setCursorEnabled(bool value) {
     cc_get_application_view()->setCursorEnabeld(value);
 }
 
-Application::Platform Application::getPlatform() const {
+Application::Platform Application::getPlatform() {
     return Platform::WINDOWS;
 }
 
@@ -231,6 +230,9 @@ void Application::onPause() {
 }
 
 void Application::onResume() {
+}
+
+void Application::onClose() {
 }
 
 std::string Application::getSystemVersion() {

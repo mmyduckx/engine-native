@@ -123,23 +123,22 @@ bool setCanvasCallback(se::Object *global) {
 MyTimer *_timer;
 } // namespace
 
-Application *              Application::_instance  = nullptr;
-std::shared_ptr<Scheduler> Application::_scheduler = nullptr;
+Application *              Application::instance  = nullptr;
+std::shared_ptr<Scheduler> Application::scheduler = nullptr;
 
 Application::Application(int width, int height) {
-    Application::_instance = this;
+    Application::instance = this;
 
     _viewLogicalSize.x = width;
     _viewLogicalSize.y = height;
 
-    _scheduler = std::make_shared<Scheduler>();
+    scheduler = std::make_shared<Scheduler>();
     EventDispatcher::init();
 
     _timer = [[MyTimer alloc] initWithApp:this fps:_fps];
 }
 
 Application::~Application() {
-
 #if USE_AUDIO
     AudioEngine::end();
 #endif
@@ -151,7 +150,7 @@ Application::~Application() {
 
     gfx::DeviceManager::destroy();
 
-    Application::_instance = nullptr;
+    Application::instance = nullptr;
     [_timer release];
 }
 
@@ -167,11 +166,11 @@ void Application::setPreferredFramesPerSecond(int fps) {
     [_timer changeFPS:_fps];
 }
 
-Application::Platform Application::getPlatform() const {
+Application::Platform Application::getPlatform() {
     return Platform::MAC;
 }
 
-std::string Application::getCurrentLanguageCode() const {
+std::string Application::getCurrentLanguageCode() {
     NSUserDefaults *defaults        = [NSUserDefaults standardUserDefaults];
     NSArray *       languages       = [defaults objectForKey:@"AppleLanguages"];
     NSString *      currentLanguage = [languages objectAtIndex:0];
@@ -200,7 +199,7 @@ void Application::setCursorEnabled(bool value) {
         CGDisplayHideCursor(kCGDirectMainDisplay);
 }
 
-Application::LanguageType Application::getCurrentLanguage() const {
+Application::LanguageType Application::getCurrentLanguage() {
     // get the current language and country config
     NSUserDefaults *defaults        = [NSUserDefaults standardUserDefaults];
     NSArray *       languages       = [defaults objectForKey:@"AppleLanguages"];
@@ -251,6 +250,9 @@ void Application::onPause() {
 
 void Application::onResume() {
     [_timer resume];
+}
+
+void Application::onClose() {
 }
 
 std::string Application::getSystemVersion() {

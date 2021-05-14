@@ -156,9 +156,9 @@ public:
     std::string name;
     union {
         void *ptrVal;
-        long  longVal;
+        int32_t  longVal;
         int   intVal;
-        short shortVal;
+        int16_t shortVal;
         char  charVal;
         bool  boolVal;
     } args[10];

@@ -241,7 +241,7 @@ void EventDispatcher::dispatchTickEvent(float /*dt*/) {
     prevTime = std::chrono::steady_clock::now();
 
     se::ValueArray args;
-    long long      milliSeconds = std::chrono::duration_cast<std::chrono::milliseconds>(prevTime - se::ScriptEngine::getInstance()->getStartTime()).count();
+    int64_t      milliSeconds = std::chrono::duration_cast<std::chrono::milliseconds>(prevTime - se::ScriptEngine::getInstance()->getStartTime()).count();
     args.push_back(se::Value(static_cast<double>(milliSeconds)));
 
     tickVal.toObject()->call(args, nullptr);

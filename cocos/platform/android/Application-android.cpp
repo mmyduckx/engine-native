@@ -63,7 +63,7 @@ bool setCanvasCallback(se::Object * /*global*/) {
     sprintf(commandBuf, "window.innerWidth = %d; window.innerHeight = %d; window.windowHandler = 0x%" PRIxPTR ";",
             static_cast<int>(viewLogicalSize.x),
             static_cast<int>(viewLogicalSize.y),
-            (uintptr_t)cc::cocosApp.window);
+            reinterpret_cast<uintptr_t>(cc::cocosApp.window));
     se->evalString(commandBuf);
 
     gfx::DeviceInfo deviceInfo;
@@ -130,7 +130,7 @@ void Application::setPreferredFramesPerSecond(int fps) {
     }
 
     _fps                            = fps;
-    _prefererredNanosecondsPerFrame = static_cast<long>(1.0 / _fps * NANOSECONDS_PER_SECOND);
+    _prefererredNanosecondsPerFrame = static_cast<int64_t>(1.0 / _fps * NANOSECONDS_PER_SECOND);
 }
 
 std::string Application::getCurrentLanguageCode() {

@@ -28,12 +28,6 @@
 #include "platform/Application.h"
 #include "platform/StdC.h" // need it to include Windows.h
 
-#include <MMSystem.h>
-#include <shellapi.h>
-#include <algorithm>
-#include <array>
-#include <memory>
-#include <sstream>
 #include "audio/include/AudioEngine.h"
 #include "base/AutoreleasePool.h"
 #include "base/Scheduler.h"
@@ -41,6 +35,12 @@
 #include "cocos/bindings/jswrapper/SeApi.h"
 #include "platform/FileUtils.h"
 #include "platform/win32/View-win32.h"
+#include <MMSystem.h>
+#include <algorithm>
+#include <array>
+#include <memory>
+#include <shellapi.h>
+#include <sstream>
 
 #include "pipeline/Define.h"
 #include "pipeline/RenderPipeline.h"
@@ -106,7 +106,7 @@ void Application::setPreferredFramesPerSecond(int fps) {
         return;
 
     _fps                            = fps;
-    _prefererredNanosecondsPerFrame = (long)(1.0 / _fps * NANOSECONDS_PER_SECOND);
+    _prefererredNanosecondsPerFrame = static_cast<int64_t>(1.0 / _fps * NANOSECONDS_PER_SECOND);
 }
 
 Application::LanguageType Application::getCurrentLanguage() {

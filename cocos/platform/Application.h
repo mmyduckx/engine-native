@@ -165,7 +165,7 @@ private:
     static Application *              instance;
     static std::shared_ptr<Scheduler> scheduler;
     int                               _fps                            = 60;
-    long                              _prefererredNanosecondsPerFrame = NANOSECONDS_60FPS;
+    int64_t                           _prefererredNanosecondsPerFrame = NANOSECONDS_60FPS;
     uint                              _totalFrames                    = 0;
     cc::Vec2                          _viewLogicalSize;
     bool                              _needRestart = false;

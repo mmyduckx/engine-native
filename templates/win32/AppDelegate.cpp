@@ -1,13 +1,13 @@
 #include "AppDelegate.h"
 
-#include <MMSystem.h>
 #include <Windows.h>
 #include <shellapi.h>
+#include <MMSystem.h>
 #include <sstream>
 
-#include "cocos/bindings/jswrapper/SeApi.h"
 #include "platform/StdC.h"
 #include "platform/win32/View-win32.h"
+#include "cocos/bindings/jswrapper/SeApi.h"
 
 namespace {
     std::weak_ptr<cc::View> gView;
@@ -70,14 +70,14 @@ std::shared_ptr<cc::View> cc_get_application_view() {
     return gView.lock();
 }
 
-AppDelegage::AppDelegage(const std::string& name, int width, int height) {
+AppDelegate::AppDelegate(const std::string& name, int width, int height) {
     _view = std::make_shared<cc::View>(name, width, height);
     _game = std::make_shared<Game>(width, height);
 
     gView = _view;
 }
 
-void AppDelegage::start() {
+void AppDelegate::start() {
     bool resume, pause, close;
     se::ScriptEngine::getInstance()->addPermanentRegisterCallback(setCanvasCallback);
 

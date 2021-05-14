@@ -85,7 +85,7 @@ AppDelegage::AppDelegage(const std::string &name, int width, int height)
 void AppDelegage::start()
 {
 
-    bool resume, pause;
+    bool resume, pause, close;
     se::ScriptEngine::getInstance()->addPermanentRegisterCallback(setCanvasCallback);
 
     if(!_view->init()) return;
@@ -135,10 +135,12 @@ void AppDelegage::start()
         
         resume = false;
         pause = false;
-        while (_view->pollEvent(&_quit, &resume, &pause)) {}
+        close = false;
+        while (_view->pollEvent(&_quit, &resume, &pause, &close)) {}
 
         if(pause) _game->onPause();
         if(resume) _game->onResume();
+        if(close) _game->onClose();
 
         QueryPerformanceCounter(&nNow);
         actualInterval = nNow.QuadPart - nLast.QuadPart;

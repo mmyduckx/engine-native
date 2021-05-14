@@ -90,7 +90,7 @@ bool View::init() {
     return true;
 }
 
-bool View::pollEvent(bool *quit, bool *resume, bool *pause) {
+bool View::pollEvent(bool *quit, bool *resume, bool *pause, bool *close) {
     int cnt = SDL_PollEvent(&sdlEvent);
     if (cnt == 0) return false;
     cc::TouchEvent    touch;
@@ -118,6 +118,9 @@ bool View::pollEvent(bool *quit, bool *resume, bool *pause) {
                     break;
                 case SDL_WINDOWEVENT_ENTER:
                     SDL_CaptureMouse(SDL_TRUE);
+                    break;
+                case SDL_WINDOWEVENT_CLOSE:
+                    *close = true;
                     break;
             }
             break;

@@ -91,6 +91,7 @@ public:
     virtual bool init();
     virtual void onPause();
     virtual void onResume();
+    virtual void onClose();
 
     void restart() { _needRestart = true; }
 

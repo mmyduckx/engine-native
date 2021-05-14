@@ -40,4 +40,5 @@ public:
     virtual bool init() override;
     virtual void onPause() override;
     virtual void onResume() override;
+    virtual void onClose() override;
 };

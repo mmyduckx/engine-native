@@ -233,6 +233,9 @@ void Application::onPause() {
 void Application::onResume() {
 }
 
+void Application::onClose() {
+}
+
 std::string Application::getSystemVersion() {
     OSVERSIONINFO osvi;
     memset(&osvi, 0, sizeof(osvi));

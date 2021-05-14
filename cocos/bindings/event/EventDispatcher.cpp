@@ -299,6 +299,10 @@ void EventDispatcher::dispatchRestartVM() {
     EventDispatcher::doDispatchEvent(EVENT_RESTART_VM, "onRestartVM", se::EmptyValueArray);
 }
 
+void EventDispatcher::dispatchCloseEvent() {
+    EventDispatcher::doDispatchEvent(EVENT_CLOSE, "onClose", se::EmptyValueArray);
+}
+
 void EventDispatcher::doDispatchEvent(const char *eventName, const char *jsFunctionName, const std::vector<se::Value> &args) {
     if (!se::ScriptEngine::getInstance()->isValid())
         return;

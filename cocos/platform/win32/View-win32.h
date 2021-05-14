@@ -48,7 +48,7 @@ public:
 
     bool init();
 
-    bool pollEvent(bool *quit, bool *resume, bool *pause);
+    bool pollEvent(bool *quit, bool *resume, bool *pause, bool *close);
 
     std::array<int, 2> getViewSize() const { return std::array<int, 2>{_width, _height}; }
 

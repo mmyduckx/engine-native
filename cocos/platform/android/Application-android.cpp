@@ -96,6 +96,11 @@ Application::~Application() {
     AudioEngine::end();
 #endif
 
+    Application::getInstance()->onClose();
+    if (EventDispatcher::initialized()) {
+        EventDispatcher::dispatchCloseEvent();
+    }
+    
     pipeline::RenderPipeline::getInstance()->destroy();
 
     EventDispatcher::destroy();

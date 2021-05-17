@@ -87,9 +87,6 @@ void View::engineHandleCmd(int cmd) {
             cc::EventDispatcher::dispatchCustomEvent(event);
         } break;
         case APP_CMD_TERM_WINDOW: {
-            if (Application::getInstance()) {
-                Application::getInstance()->onClose();
-            }
             cc::CustomEvent event;
             event.name         = EVENT_DESTROY_WINDOW;
             event.args->ptrVal = cocosApp.window;

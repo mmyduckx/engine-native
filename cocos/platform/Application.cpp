@@ -63,6 +63,33 @@ void Application::restartVM() {
     init();
 }
 
+void Application::close() {
+    if (cc::EventDispatcher::initialized()) {
+        cc::EventDispatcher::dispatchCloseEvent();
+    }
+
+    auto *scriptEngine = se::ScriptEngine::getInstance();
+
+    cc::PoolManager::getInstance()->getCurrentPool()->clear();
+#if USE_AUDIO
+    cc::AudioEngine::stopAll();
+#endif
+#if USE_SOCKET
+    cc::network::WebSocket::closeAllConnections();
+#endif
+    cc::network::HttpClient::destroyInstance();
+
+    scheduler->removeAllFunctionsToBePerformedInCocosThread();
+    scheduler->unscheduleAll();
+
+    scriptEngine->cleanup();
+    cc::EventDispatcher::destroy();
+
+    // exit
+
+    exit(0);
+}
+
 void Application::tick() {
     if (_needRestart) {
         restartVM();

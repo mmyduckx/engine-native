@@ -98,6 +98,7 @@ public:
     void tick();
 
     void restartVM();
+    void close();
 
     static inline std::shared_ptr<Scheduler> getScheduler() { return scheduler; }
 

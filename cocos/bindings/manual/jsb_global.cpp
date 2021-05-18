@@ -45,9 +45,11 @@
 #include <regex>
 #include <sstream>
 
-using namespace cc;
+using cc::LegacyThreadPool;
+using cc::FileUtils;
+using cc::Application;
 
-static LegacyThreadPool *__threadPool = nullptr;
+static LegacyThreadPool *threadPool = nullptr;
 
 static std::shared_ptr<cc::network::Downloader>                                               localDownloader = nullptr;
 static std::map<std::string, std::function<void(const std::string &, unsigned char *, uint)>> localDownloaderHandlers;
@@ -116,9 +118,8 @@ bool jsb_set_extend_property(const char *ns, const char *clsName) {
     return false;
 }
 
-namespace {
 
-std::unordered_map<std::string, se::Value> __moduleCache;
+std::unordered_map<std::string, se::Value> moduleCache;
 
 bool require(se::State &s) {
     const auto &args = s.args();
@@ -171,10 +172,10 @@ bool doModuleRequire(const std::string &path, se::Value *ret, const std::string 
     }
 
     if (!scriptBuffer.empty()) {
-        const auto &iter = __moduleCache.find(fullPath);
-        if (iter != __moduleCache.end()) {
+        const auto &iter = moduleCache.find(fullPath);
+        if (iter != moduleCache.end()) {
             *ret = iter->second;
-            //                printf("Found cache: %s, value: %d\n", fullPath.c_str(), (int)ret->getType());
+            //                printf("Found cache: %s, value: %d\n", fullPath.c_str(), static_cast<int>(ret->getType()));
             return true;
         }
         std::string currentScriptFileDir = FileUtils::getInstance()->getFileDir(fullPath);
@@ -217,14 +218,14 @@ bool doModuleRequire(const std::string &path, se::Value *ret, const std::string 
                     *ret = exportsVal;
                 }
 
-                __moduleCache[fullPath] = std::move(exportsVal);
+                moduleCache[fullPath] = std::move(exportsVal);
             } else {
-                __moduleCache[fullPath] = se::Value::Undefined;
+                moduleCache[fullPath] = se::Value::Undefined;
             }
             // clear module.exports
             moduleVal.toObject()->setProperty("exports", se::Value::Undefined);
         } else {
-            __moduleCache[fullPath] = se::Value::Undefined;
+            moduleCache[fullPath] = se::Value::Undefined;
         }
         assert(succeed);
         return succeed;
@@ -245,7 +246,6 @@ bool moduleRequire(se::State &s) {
     return doModuleRequire(args[0].toString(), &s.rval(), args[1].toString());
 }
 SE_BIND_FUNC(moduleRequire)
-} // namespace
 
 bool jsb_run_script(const std::string &filePath, se::Value *rval /* = nullptr */) {
     se::AutoHandleScope hs;
@@ -263,7 +263,7 @@ static bool jscGarbageCollect(se::State &s) {
 SE_BIND_FUNC(jscGarbageCollect)
 
 static bool jscDumpNativePtrToSeObjectMap(se::State &s) {
-    CC_LOG_DEBUG(">>> total: %d, Dump (native -> jsobj) map begin", (int)se::NativePtrToObjectMap::size());
+    CC_LOG_DEBUG(">>> total: %d, Dump (native -> jsobj) map begin", static_cast<int>(se::NativePtrToObjectMap::size()));
 
     struct NamePtrStruct {
         const char *name;
@@ -297,7 +297,7 @@ static bool jscDumpNativePtrToSeObjectMap(se::State &s) {
     for (const auto &e : namePtrArray) {
         CC_LOG_DEBUG("%s: %p", e.name, e.ptr);
     }
-    CC_LOG_DEBUG(">>> total: %d, nonRefMap: %d, Dump (native -> jsobj) map end", (int)se::NativePtrToObjectMap::size(), (int)se::NonRefNativePtrCreatedByCtorMap::size());
+    CC_LOG_DEBUG(">>> total: %d, nonRefMap: %d, Dump (native -> jsobj) map end", static_cast<int>(se::NativePtrToObjectMap::size()), static_cast<int>(se::NonRefNativePtrCreatedByCtorMap::size()));
     return true;
 }
 SE_BIND_FUNC(jscDumpNativePtrToSeObjectMap)
@@ -309,7 +309,7 @@ static bool jscDumpRoot(se::State &s) {
 SE_BIND_FUNC(jscDumpRoot)
 
 static bool jsbCorePlatform(se::State &s) {
-    Application::Platform platform = Application::getInstance()->getPlatform();
+    Application::Platform platform = Application::getPlatform();
     s.rval().setInt32(static_cast<int32_t>(platform));
     return true;
 }
@@ -338,7 +338,7 @@ SE_BIND_FUNC(jsbCoreOs)
 
 static bool jsbCoreGetCurrentLanguage(se::State &s) {
     std::string               languageStr;
-    Application::LanguageType language = Application::getInstance()->getCurrentLanguage();
+    Application::LanguageType language = Application::getCurrentLanguage();
     switch (language) {
         case Application::LanguageType::ENGLISH:
             languageStr = "en";
@@ -407,14 +407,14 @@ static bool jsbCoreGetCurrentLanguage(se::State &s) {
 SE_BIND_FUNC(jsbCoreGetCurrentLanguage)
 
 static bool jsbCoreGetCurrentLanguageCode(se::State &s) {
-    std::string language = Application::getInstance()->getCurrentLanguageCode();
+    std::string language = Application::getCurrentLanguageCode();
     s.rval().setString(language);
     return true;
 }
 SE_BIND_FUNC(jsbCoreGetCurrentLanguageCode)
 
 static bool jsbGetOsVersion(se::State &s) {
-    std::string systemVersion = Application::getInstance()->getSystemVersion();
+    std::string systemVersion = Application::getSystemVersion();
     s.rval().setString(systemVersion);
     return true;
 }
@@ -428,7 +428,7 @@ static bool jsbCoreRestartVm(se::State &s) {
 SE_BIND_FUNC(jsbCoreRestartVm)
 
 static bool jsbCloseWindow(se::State &s) {
-    Application::getInstance()->close();
+    Application::close();
     return true;
 }
 SE_BIND_FUNC(jsbCloseWindow)
@@ -502,7 +502,6 @@ static bool jsPerformanceNow(se::State &s) {
 }
 SE_BIND_FUNC(jsPerformanceNow)
 
-namespace {
 struct ImageInfo {
     uint32_t        length     = 0;
     uint32_t        width      = 0;
@@ -546,7 +545,7 @@ uint8_t *convertI2RGBA(uint32_t length, uint8_t *src) {
     return dst;
 }
 
-struct ImageInfo *createImageInfo(Image *img) {
+struct ImageInfo *createImageInfo(cc::Image *img) {
     auto *imgInfo   = new struct ImageInfo();
     imgInfo->length = static_cast<uint32_t>(img->getDataLen());
     imgInfo->width  = img->getWidth();
@@ -590,7 +589,7 @@ struct ImageInfo *createImageInfo(Image *img) {
 
     return imgInfo;
 }
-} // namespace
+
 
 bool jsb_global_load_image(const std::string &path, const se::Value &callbackVal) {
     if (path.empty()) {
@@ -602,9 +601,9 @@ bool jsb_global_load_image(const std::string &path, const se::Value &callbackVal
     std::shared_ptr<se::Value> callbackPtr = std::make_shared<se::Value>(callbackVal);
 
     auto initImageFunc = [path, callbackPtr](const std::string &fullPath, unsigned char *imageData, int imageBytes) {
-        auto *img = new (std::nothrow) Image();
+        auto *img = new (std::nothrow) cc::Image();
 
-        __threadPool->pushTask([=](int /*tid*/) {
+        threadPool->pushTask([=](int /*tid*/) {
             // NOTE: FileUtils::getInstance()->fullPathForFilename isn't a threadsafe method,
             // Image::initWithImageFile will call fullPathForFilename internally which may
             // cause thread race issues. Therefore, we get the full path of file before
@@ -623,7 +622,7 @@ bool jsb_global_load_image(const std::string &path, const se::Value &callbackVal
                 imgInfo = createImageInfo(img);
             }
 
-            Application::getInstance()->getScheduler()->performFunctionInCocosThread([=]() {
+            Application::getScheduler()->performFunctionInCocosThread([=]() {
                 se::AutoHandleScope hs;
                 se::ValueArray      seArgs;
                 se::Value           dataVal;
@@ -656,7 +655,7 @@ bool jsb_global_load_image(const std::string &path, const se::Value &callbackVal
         size_t         dataStartPos = pos + strlen("base64,");
         const char *   base64Data   = path.data() + dataStartPos;
         size_t         dataLen      = path.length() - dataStartPos;
-        imageBytes                  = base64Decode(reinterpret_cast<const unsigned char *>(base64Data), static_cast<unsigned int>(dataLen), &imageData);
+        imageBytes                  = cc::base64Decode(reinterpret_cast<const unsigned char *>(base64Data), static_cast<unsigned int>(dataLen), &imageData);
         if (imageBytes <= 0 || imageData == nullptr) {
             SE_REPORT_ERROR("Decode base64 image data failed!");
             return false;
@@ -692,7 +691,7 @@ static bool jsLoadImage(se::State &s) {
 
         return jsb_global_load_image(path, callbackVal);
     }
-    SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d", (int)argc, 2);
+    SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d", static_cast<int>(argc), 2);
     return false;
 }
 SE_BIND_FUNC(jsLoadImage)
@@ -709,7 +708,7 @@ static bool jsDestroyImage(se::State &s) {
 
         return true;
     }
-    SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d", (int)argc, 1);
+    SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d", static_cast<int>(argc), 1);
     return false;
 }
 SE_BIND_FUNC(jsDestroyImage)
@@ -722,11 +721,11 @@ static bool jsbOpenUrl(se::State &s) {
         std::string url;
         ok = seval_to_std_string(args[0], &url);
         SE_PRECONDITION2(ok, false, "url is invalid!");
-        Application::getInstance()->openURL(url);
+        Application::openURL(url);
         return true;
     }
 
-    SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d", (int)argc, 1);
+    SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d", static_cast<int>(argc), 1);
     return false;
 }
 SE_BIND_FUNC(jsbOpenUrl)
@@ -739,11 +738,11 @@ static bool jsbCopyTextToClipboard(se::State &s) {
         std::string text;
         ok = seval_to_std_string(args[0], &text);
         SE_PRECONDITION2(ok, false, "text is invalid!");
-        Application::getInstance()->copyTextToClipboard(text);
+        Application::copyTextToClipboard(text);
         return true;
     }
 
-    SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d", (int)argc, 1);
+    SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d", static_cast<int>(argc), 1);
     return false;
 }
 SE_BIND_FUNC(jsbCopyTextToClipboard)
@@ -761,7 +760,7 @@ static bool jsbSetPreferredFramesPerSecond(se::State &s) {
         return true;
     }
 
-    SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d", (int)argc, 1);
+    SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d", static_cast<int>(argc), 1);
     return false;
 }
 SE_BIND_FUNC(jsbSetPreferredFramesPerSecond)
@@ -838,18 +837,18 @@ static bool jsbShowInputBox(se::State &s) {
             }
         }
 
-        EditBox::show(showInfo);
+        cc::EditBox::show(showInfo);
 
         return true;
     }
 
-    SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d", (int)argc, 1);
+    SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d", static_cast<int>(argc), 1);
     return false;
 }
 SE_BIND_FUNC(jsbShowInputBox);
 
 static bool jsbHideInputBox(se::State &s) {
-    EditBox::hide();
+    cc::EditBox::hide();
     return true;
 }
 SE_BIND_FUNC(jsbHideInputBox)
@@ -857,7 +856,7 @@ SE_BIND_FUNC(jsbHideInputBox)
 #endif
 
 bool jsb_register_global_variables(se::Object *global) {
-    __threadPool = LegacyThreadPool::newFixedThreadPool(3);
+    threadPool = LegacyThreadPool::newFixedThreadPool(3);
 
     global->defineFunction("require", _SE(require));
     global->defineFunction("requireModule", _SE(moduleRequire));
@@ -897,16 +896,16 @@ bool jsb_register_global_variables(se::Object *global) {
     se::ScriptEngine::getInstance()->clearException();
 
     se::ScriptEngine::getInstance()->addBeforeCleanupHook([]() {
-        delete __threadPool;
-        __threadPool = nullptr;
+        delete threadPool;
+        threadPool = nullptr;
 
-        PoolManager::getInstance()->getCurrentPool()->clear();
+        cc::PoolManager::getInstance()->getCurrentPool()->clear();
     });
 
     se::ScriptEngine::getInstance()->addAfterCleanupHook([]() {
-        PoolManager::getInstance()->getCurrentPool()->clear();
+        cc::PoolManager::getInstance()->getCurrentPool()->clear();
 
-        __moduleCache.clear();
+        moduleCache.clear();
 
         SAFE_DEC_REF(__jsbObj);
         SAFE_DEC_REF(__glObj);

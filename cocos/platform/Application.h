@@ -94,11 +94,10 @@ public:
     virtual void onClose();
 
     void restart() { _needRestart = true; }
-
     void tick();
-
     void restartVM();
-    void close();
+
+    static void close();
 
     static inline std::shared_ptr<Scheduler> getScheduler() { return scheduler; }
 

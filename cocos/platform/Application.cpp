@@ -123,7 +123,7 @@ void Application::tick() {
     }
 
     now  = std::chrono::steady_clock::now();
-    dtNS = dtNS * 0.1 + 0.9 * std::chrono::duration_cast<std::chrono::nanoseconds>(now - prevTime).count();
+    dtNS = dtNS * 0.1 + 0.9 * static_cast<double>(std::chrono::duration_cast<std::chrono::nanoseconds>(now - prevTime).count());
     dt   = static_cast<float>(dtNS) / NANOSECONDS_PER_SECOND;
 }
 

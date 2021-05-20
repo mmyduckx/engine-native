@@ -45,9 +45,9 @@
 #include <regex>
 #include <sstream>
 
-using cc::LegacyThreadPool;
-using cc::FileUtils;
 using cc::Application;
+using cc::FileUtils;
+using cc::LegacyThreadPool;
 
 static LegacyThreadPool *threadPool = nullptr;
 
@@ -117,7 +117,6 @@ bool jsb_set_extend_property(const char *ns, const char *clsName) {
     }
     return false;
 }
-
 
 std::unordered_map<std::string, se::Value> moduleCache;
 
@@ -192,24 +191,30 @@ bool doModuleRequire(const std::string &path, se::Value *ret, const std::string 
         //            fwrite(scriptBuffer.c_str(), scriptBuffer.length(), 1, fp);
         //            fclose(fp);
 
-        std::string reletivePath = fullPath;
+        std::string relativePath;
+
 #if CC_PLATFORM == CC_PLATFORM_MAC_OSX || CC_PLATFORM == CC_PLATFORM_MAC_IOS
+
+        std::string relativePathKey;
+
     #if CC_PLATFORM == CC_PLATFORM_MAC_OSX
-        const std::string reletivePathKey = "/Contents/Resources";
+        relativePathKey = "/Contents/Resources";
     #else
-        const std::string reletivePathKey = ".app";
+        relativePathKey = ".app";
     #endif
 
-        size_t pos = reletivePath.find(reletivePathKey);
+        size_t pos = fullPath.find(relativePathKey);
         if (pos != std::string::npos) {
-            reletivePath = reletivePath.substr(pos + reletivePathKey.length() + 1);
+            relativePath = fullPath.substr(pos + relativePathKey.length() + 1);
         }
+#else
+        relativePath = fullPath;
 #endif
 
         //            RENDERER_LOGD("Evaluate: %s", fullPath.c_str());
 
         auto *    se      = se::ScriptEngine::getInstance();
-        bool      succeed = se->evalString(scriptBuffer.c_str(), scriptBuffer.length(), nullptr, reletivePath.c_str());
+        bool      succeed = se->evalString(scriptBuffer.c_str(), static_cast<ssize_t>(scriptBuffer.length()), nullptr, relativePath.c_str());
         se::Value moduleVal;
         if (succeed && se->getGlobalObject()->getProperty("module", &moduleVal) && moduleVal.isObject()) {
             se::Value exportsVal;
@@ -287,7 +292,8 @@ static bool jscDumpNativePtrToSeObjectMap(se::State &s) {
         for (std::string::const_iterator lit = left.begin(), rit = right.begin(); lit != left.end() && rit != right.end(); ++lit, ++rit) {
             if (::tolower(*lit) < ::tolower(*rit)) {
                 return true;
-            } else if (::tolower(*lit) > ::tolower(*rit)) {
+            }
+            if (::tolower(*lit) > ::tolower(*rit)) {
                 return false;
             }
         }
@@ -590,7 +596,6 @@ struct ImageInfo *createImageInfo(cc::Image *img) {
     return imgInfo;
 }
 
-
 bool jsb_global_load_image(const std::string &path, const se::Value &callbackVal) {
     if (path.empty()) {
         se::ValueArray seArgs;
@@ -629,7 +634,7 @@ bool jsb_global_load_image(const std::string &path, const se::Value &callbackVal
 
                 if (loadSucceed) {
                     se::HandleObject retObj(se::Object::createPlainObject());
-                    ulong_to_seval((unsigned long)imgInfo->data, &dataVal);
+                    ulong_to_seval((unsigned long)imgInfo->data, &dataVal); //NOLINT
                     retObj->setProperty("data", dataVal);
                     retObj->setProperty("width", se::Value(imgInfo->width));
                     retObj->setProperty("height", se::Value(imgInfo->height));
@@ -701,10 +706,10 @@ static bool jsDestroyImage(se::State &s) {
     size_t         argc = args.size();
     CC_UNUSED bool ok   = true;
     if (argc == 1) {
-        unsigned long data = 0;
+        unsigned long data = 0; //NOLINT
         ok &= seval_to_ulong(args[0], &data);
         SE_PRECONDITION2(ok, false, "js_destroyImage : Error processing arguments");
-        free(reinterpret_cast<char *>(data));
+        free(reinterpret_cast<char *>(data)); //NOLINT performance-no-int-to-ptr
 
         return true;
     }

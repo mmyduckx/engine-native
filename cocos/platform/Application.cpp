@@ -63,7 +63,7 @@ void Application::restartVM() {
     init();
 }
 
-void Application::close() {
+void Application::close() { // NOLINT
     if (cc::EventDispatcher::initialized()) {
         cc::EventDispatcher::dispatchCloseEvent();
     }

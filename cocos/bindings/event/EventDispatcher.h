@@ -76,15 +76,15 @@ struct MouseEvent {
     // The button number that was pressed when the mouse event was fired: Left button=0, middle button=1 (if present), right button=2.
     // For mice configured for left handed use in which the button actions are reversed the values are instead read from right to left.
     uint16_t button = 0;
-    Type           type   = Type::UNKNOWN;
+    Type     type   = Type::UNKNOWN;
 };
 
 enum class KeyCode {
-    BACKSPACE      = 8,
-    TAB            = 9,
+    BACKSPACE       = 8,
+    TAB             = 9,
     NUM_LOCK        = 12,
     NUMPAD_ENTER    = 20013,
-    ENTER          = 13,
+    ENTER           = 13,
     SHIFT_RIGHT     = 20016,
     SHIFT_LEFT      = 16,
     CONTROL_LEFT    = 17,
@@ -92,17 +92,17 @@ enum class KeyCode {
     ALT_RIGHT       = 20018,
     ALT_LEFT        = 18,
     CAPS_LOCK       = 20,
-    ESCAPE         = 27,
-    SPACE          = 32,
+    ESCAPE          = 27,
+    SPACE           = 32,
     PAGE_UP         = 33,
     PAGE_DOWN       = 34,
-    END            = 35,
-    HOME           = 36,
+    END             = 35,
+    HOME            = 36,
     ARROW_LEFT      = 37,
     ARROW_UP        = 38,
     ARROW_RIGHT     = 39,
     ARROW_DOWN      = 40,
-    Delete         = 46,
+    Delete          = 46, // NOLINT
     META_LEFT       = 91,
     CONTEXT_MENU    = 20093,
     META_RIGHT      = 93,
@@ -111,27 +111,27 @@ enum class KeyCode {
     NUMPAD_MINUS    = 109,
     NUMPAD_DECIMAL  = 110,
     NUMPAD_DIVIDE   = 111,
-    SEMICOLON      = 186,
-    EQUAL          = 187,
-    COMMA          = 188,
-    MINUS          = 189,
-    PERIOD         = 190,
-    SLASH          = 191,
-    BACKQUOTE      = 192,
+    SEMICOLON       = 186,
+    EQUAL           = 187,
+    COMMA           = 188,
+    MINUS           = 189,
+    PERIOD          = 190,
+    SLASH           = 191,
+    BACKQUOTE       = 192,
     BRACKET_LEFT    = 219,
-    BACKSLASH      = 220,
+    BACKSLASH       = 220,
     BRACKET_RIGHT   = 221,
-    QUOTE          = 222,
-    NUMPAD_0       = 10048,
-    NUMPAD_1       = 10049,
-    NUMPAD_2       = 10050,
-    NUMPAD_3       = 10051,
-    NUMPAD_4       = 10052,
-    NUMPAD_5       = 10053,
-    NUMPAD_6       = 10054,
-    NUMPAD_7       = 10055,
-    NUMPAD_8       = 10056,
-    NUMPAD_9       = 10057
+    QUOTE           = 222,
+    NUMPAD_0        = 10048,
+    NUMPAD_1        = 10049,
+    NUMPAD_2        = 10050,
+    NUMPAD_3        = 10051,
+    NUMPAD_4        = 10052,
+    NUMPAD_5        = 10053,
+    NUMPAD_6        = 10054,
+    NUMPAD_7        = 10055,
+    NUMPAD_8        = 10056,
+    NUMPAD_9        = 10057
 };
 
 struct KeyboardEvent {
@@ -155,12 +155,12 @@ class CustomEvent {
 public:
     std::string name;
     union {
-        void *ptrVal;
-        int32_t  longVal;
-        int   intVal;
+        void *  ptrVal;
+        int32_t longVal;
+        int     intVal;
         int16_t shortVal;
-        char  charVal;
-        bool  boolVal;
+        char    charVal;
+        bool    boolVal;
     } args[10];
 
     CustomEvent()          = default;

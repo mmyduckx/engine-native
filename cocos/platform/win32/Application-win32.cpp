@@ -109,7 +109,7 @@ void Application::setPreferredFramesPerSecond(int fps) {
     _prefererredNanosecondsPerFrame = static_cast<int64_t>(1.0 / _fps * NANOSECONDS_PER_SECOND);
 }
 
-Application::LanguageType Application::getCurrentLanguage() {
+Application::LanguageType Application::getCurrentLanguage() const {
     LanguageType ret = LanguageType::ENGLISH;
 
     LCID           localeID          = GetUserDefaultLCID();
@@ -178,7 +178,7 @@ Application::LanguageType Application::getCurrentLanguage() {
     return ret;
 }
 
-std::string Application::getCurrentLanguageCode() {
+std::string Application::getCurrentLanguageCode() const {
     LANGID     lid       = GetUserDefaultUILanguage();
     const LCID locale_id = MAKELCID(lid, SORT_DEFAULT);
     int        length    = GetLocaleInfoA(locale_id, LOCALE_SISO639LANGNAME, nullptr, 0);
@@ -210,7 +210,7 @@ void Application::setCursorEnabled(bool value) {
     cc_get_application_view()->setCursorEnabeld(value);
 }
 
-Application::Platform Application::getPlatform() {
+Application::Platform Application::getPlatform() const {
     return Platform::WINDOWS;
 }
 

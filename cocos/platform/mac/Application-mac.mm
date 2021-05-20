@@ -166,11 +166,11 @@ void Application::setPreferredFramesPerSecond(int fps) {
     [_timer changeFPS:_fps];
 }
 
-Application::Platform Application::getPlatform() {
+Application::Platform Application::getPlatform() const {
     return Platform::MAC;
 }
 
-std::string Application::getCurrentLanguageCode() {
+std::string Application::getCurrentLanguageCode() const {
     NSUserDefaults *defaults        = [NSUserDefaults standardUserDefaults];
     NSArray *       languages       = [defaults objectForKey:@"AppleLanguages"];
     NSString *      currentLanguage = [languages objectAtIndex:0];
@@ -199,7 +199,7 @@ void Application::setCursorEnabled(bool value) {
         CGDisplayHideCursor(kCGDirectMainDisplay);
 }
 
-Application::LanguageType Application::getCurrentLanguage() {
+Application::LanguageType Application::getCurrentLanguage() const {
     // get the current language and country config
     NSUserDefaults *defaults        = [NSUserDefaults standardUserDefaults];
     NSArray *       languages       = [defaults objectForKey:@"AppleLanguages"];

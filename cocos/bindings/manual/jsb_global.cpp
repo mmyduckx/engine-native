@@ -315,7 +315,7 @@ static bool jscDumpRoot(se::State &s) {
 SE_BIND_FUNC(jscDumpRoot)
 
 static bool jsbCorePlatform(se::State &s) {
-    Application::Platform platform = Application::getPlatform();
+    Application::Platform platform = Application::getInstance()->getPlatform();
     s.rval().setInt32(static_cast<int32_t>(platform));
     return true;
 }
@@ -344,7 +344,7 @@ SE_BIND_FUNC(jsbCoreOs)
 
 static bool jsbCoreGetCurrentLanguage(se::State &s) {
     std::string               languageStr;
-    Application::LanguageType language = Application::getCurrentLanguage();
+    Application::LanguageType language = Application::getInstance()->getCurrentLanguage();
     switch (language) {
         case Application::LanguageType::ENGLISH:
             languageStr = "en";
@@ -413,14 +413,14 @@ static bool jsbCoreGetCurrentLanguage(se::State &s) {
 SE_BIND_FUNC(jsbCoreGetCurrentLanguage)
 
 static bool jsbCoreGetCurrentLanguageCode(se::State &s) {
-    std::string language = Application::getCurrentLanguageCode();
+    std::string language = Application::getInstance()->getCurrentLanguageCode();
     s.rval().setString(language);
     return true;
 }
 SE_BIND_FUNC(jsbCoreGetCurrentLanguageCode)
 
 static bool jsbGetOsVersion(se::State &s) {
-    std::string systemVersion = Application::getSystemVersion();
+    std::string systemVersion = Application::getInstance()->getSystemVersion();
     s.rval().setString(systemVersion);
     return true;
 }
@@ -434,7 +434,7 @@ static bool jsbCoreRestartVm(se::State &s) {
 SE_BIND_FUNC(jsbCoreRestartVm)
 
 static bool jsbCloseWindow(se::State &s) {
-    Application::close();
+    Application::getInstance()->close();
     return true;
 }
 SE_BIND_FUNC(jsbCloseWindow)
@@ -627,7 +627,7 @@ bool jsb_global_load_image(const std::string &path, const se::Value &callbackVal
                 imgInfo = createImageInfo(img);
             }
 
-            Application::getScheduler()->performFunctionInCocosThread([=]() {
+            Application::getInstance()->getScheduler()->performFunctionInCocosThread([=]() {
                 se::AutoHandleScope hs;
                 se::ValueArray      seArgs;
                 se::Value           dataVal;
@@ -706,10 +706,10 @@ static bool jsDestroyImage(se::State &s) {
     size_t         argc = args.size();
     CC_UNUSED bool ok   = true;
     if (argc == 1) {
-        unsigned long data = 0; //NOLINT
-        ok &= seval_to_ulong(args[0], &data);
+        char *data = nullptr;
+        ok &= seval_to_ulong(args[0], reinterpret_cast<unsigned long *>(&data)); //NOLINT google-runtime-int
         SE_PRECONDITION2(ok, false, "js_destroyImage : Error processing arguments");
-        free(reinterpret_cast<char *>(data)); //NOLINT performance-no-int-to-ptr
+        free(data);
 
         return true;
     }
@@ -726,7 +726,7 @@ static bool jsbOpenUrl(se::State &s) {
         std::string url;
         ok = seval_to_std_string(args[0], &url);
         SE_PRECONDITION2(ok, false, "url is invalid!");
-        Application::openURL(url);
+        Application::getInstance()->openURL(url);
         return true;
     }
 
@@ -743,7 +743,7 @@ static bool jsbCopyTextToClipboard(se::State &s) {
         std::string text;
         ok = seval_to_std_string(args[0], &text);
         SE_PRECONDITION2(ok, false, "text is invalid!");
-        Application::copyTextToClipboard(text);
+        Application::getInstance()->copyTextToClipboard(text);
         return true;
     }
 

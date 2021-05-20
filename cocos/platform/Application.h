@@ -97,9 +97,9 @@ public:
     void tick();
     void restartVM();
 
-    static void close();
+    void close();
 
-    static inline std::shared_ptr<Scheduler> getScheduler() { return scheduler; }
+    inline std::shared_ptr<Scheduler> getScheduler() const { return scheduler; } // NOLINT
 
     /**
      * @brief Sets the preferred frame rate for main loop callback.
@@ -118,24 +118,24 @@ public:
      @brief Get current language config.
      @return Current language config.
      */
-    static LanguageType getCurrentLanguage();
+    LanguageType getCurrentLanguage() const;
 
     /**
      @brief Get current language iso 639-1 code.
      @return Current language iso 639-1 code.
      */
-    static std::string getCurrentLanguageCode();
+    std::string getCurrentLanguageCode() const;
 
     /**
      @brief Get current display stats.
      @return bool, is displaying stats or not.
      */
-    static bool isDisplayStats();
+    bool isDisplayStats();
 
     /**
      @brief set display stats information.
      */
-    static void setDisplayStats(bool isShow);
+    void setDisplayStats(bool isShow);
 
     /**
      @brief enable/disable(lock) the cursor, default is enabled
@@ -145,18 +145,18 @@ public:
     /**
      @brief Get target platform.
      */
-    static Platform getPlatform();
+    Platform getPlatform() const;
 
     /**
      @brief Open url in default browser.
      @param String with url to open.
      @return True if the resource located by the URL was successfully opened; otherwise false.
      */
-    static bool openURL(const std::string &url);
+    bool openURL(const std::string &url);
 
-    static void copyTextToClipboard(const std::string &text);
+    void copyTextToClipboard(const std::string &text);
 
-    static std::string getSystemVersion();
+    std::string getSystemVersion();
 
     // return size in logical pixel unit.
     inline const cc::Vec2 &getViewLogicalSize() const { return _viewLogicalSize; }

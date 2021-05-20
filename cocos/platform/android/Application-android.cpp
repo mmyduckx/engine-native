@@ -100,7 +100,7 @@ Application::~Application() {
     if (EventDispatcher::initialized()) {
         EventDispatcher::dispatchCloseEvent();
     }
-    
+
     pipeline::RenderPipeline::getInstance()->destroy();
 
     EventDispatcher::destroy();
@@ -138,11 +138,11 @@ void Application::setPreferredFramesPerSecond(int fps) {
     _prefererredNanosecondsPerFrame = static_cast<int64_t>(1.0 / _fps * NANOSECONDS_PER_SECOND);
 }
 
-std::string Application::getCurrentLanguageCode() {
+std::string Application::getCurrentLanguageCode() const { // NOLINT
     return getCurrentLanguageCodeJNI();
 }
 
-bool Application::isDisplayStats() {
+bool Application::isDisplayStats() { //NOLINT
     se::AutoHandleScope hs;
     se::Value           ret;
     char                commandBuf[100] = "cc.debug.isDisplayStats();";
@@ -150,7 +150,7 @@ bool Application::isDisplayStats() {
     return ret.toBoolean();
 }
 
-void Application::setDisplayStats(bool isShow) {
+void Application::setDisplayStats(bool isShow) { // NOLINT
     se::AutoHandleScope hs;
     char                commandBuf[100] = {0};
     sprintf(commandBuf, "cc.debug.setDisplayStats(%s);", isShow ? "true" : "false");
@@ -160,7 +160,7 @@ void Application::setDisplayStats(bool isShow) {
 void Application::setCursorEnabled(bool value) {
 }
 
-Application::LanguageType Application::getCurrentLanguage() {
+Application::LanguageType Application::getCurrentLanguage() const { // NOLINT
     std::string  languageName  = getCurrentLanguageJNI();
     const char * pLanguageName = languageName.c_str();
     LanguageType ret           = LanguageType::ENGLISH;
@@ -207,19 +207,19 @@ Application::LanguageType Application::getCurrentLanguage() {
     return ret;
 }
 
-Application::Platform Application::getPlatform() {
+Application::Platform Application::getPlatform() const { // NOLINT
     return Platform::ANDROIDOS;
 }
 
-bool Application::openURL(const std::string &url) {
+bool Application::openURL(const std::string &url) { // NOLINT
     return openURLJNI(url);
 }
 
-void Application::copyTextToClipboard(const std::string &text) {
+void Application::copyTextToClipboard(const std::string &text) { // NOLINT
     copyTextToClipboardJNI(text);
 }
 
-std::string Application::getSystemVersion() {
+std::string Application::getSystemVersion() { // NOLINT
     return getSystemVersionJNI();
 }
 

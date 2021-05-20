@@ -159,7 +159,7 @@ Application::~Application() {
     [_timer release];
 }
 
-std::string Application::getCurrentLanguageCode() {
+std::string Application::getCurrentLanguageCode() const {
     NSUserDefaults *defaults        = [NSUserDefaults standardUserDefaults];
     NSArray *       languages       = [defaults objectForKey:@"AppleLanguages"];
     NSString *      currentLanguage = [languages objectAtIndex:0];
@@ -184,7 +184,7 @@ void Application::setDisplayStats(bool isShow) {
 void Application::setCursorEnabled(bool value) {
 }
 
-Application::LanguageType Application::getCurrentLanguage() {
+Application::LanguageType Application::getCurrentLanguage() const {
     // get the current language and country config
     NSUserDefaults *defaults        = [NSUserDefaults standardUserDefaults];
     NSArray *       languages       = [defaults objectForKey:@"AppleLanguages"];
@@ -216,7 +216,7 @@ Application::LanguageType Application::getCurrentLanguage() {
     return LanguageType::ENGLISH;
 }
 
-Application::Platform Application::getPlatform() {
+Application::Platform Application::getPlatform() const {
     if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) // idiom for iOS <= 3.2, otherwise: [UIDevice userInterfaceIdiom] is faster.
         return Platform::IPAD;
     else

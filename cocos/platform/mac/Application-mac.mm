@@ -143,7 +143,10 @@ Application::~Application() {
     AudioEngine::end();
 #endif
 
-    pipeline::RenderPipeline::getInstance()->destroy();
+    auto *pipelineInst = pipeline::RenderPipeline::getInstance();
+    if (pipelineInst) {
+        pipelineInst->destroy();
+    }
 
     EventDispatcher::destroy();
     se::ScriptEngine::destroyInstance();

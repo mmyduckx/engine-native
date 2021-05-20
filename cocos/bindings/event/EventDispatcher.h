@@ -102,7 +102,7 @@ enum class KeyCode {
     ARROW_UP        = 38,
     ARROW_RIGHT     = 39,
     ARROW_DOWN      = 40,
-    Delete          = 46, // NOLINT
+    DELETE_KEY      = 46, //DELETE has conflict
     META_LEFT       = 91,
     CONTEXT_MENU    = 20093,
     META_RIGHT      = 93,

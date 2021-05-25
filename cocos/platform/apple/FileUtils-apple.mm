@@ -211,10 +211,10 @@ std::string FileUtilsApple::getWritablePath() const {
         return _writablePath;
     }
 
-    // save to document folder
-    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
-    NSString *documentsDirectory = [paths objectAtIndex:0];
-    std::string strRet = [documentsDirectory UTF8String];
+    // save to Library/Caches folder
+    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES);
+    NSString *cachesDirectory = [paths objectAtIndex:0];
+    std::string strRet = [cachesDirectory UTF8String];
     strRet.append("/");
     return strRet;
 }

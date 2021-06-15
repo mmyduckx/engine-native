@@ -107,9 +107,7 @@ void SkeletonAnimation::initialize() {
     _state->setListener(animationCallback);
 }
 
-SkeletonAnimation::SkeletonAnimation()
-: SkeletonRenderer() {
-}
+SkeletonAnimation::SkeletonAnimation() = default;
 
 SkeletonAnimation::~SkeletonAnimation() {
     _startListener     = nullptr;

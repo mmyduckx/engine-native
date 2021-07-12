@@ -33,6 +33,9 @@ function clearUselessPlatform() {
         clearDirectory = path.join(externalDir, "./ios");
         console.log(`  ${chalk.green('Remove directory: ')} ${clearDirectory}`);
         ensureRemove(clearDirectory);
+        clearDirectory = path.join(externalDir, "./ios-m1-simulator");
+        console.log(`  ${chalk.green('Remove directory: ')} ${clearDirectory}`);
+        ensureRemove(clearDirectory);
     }
     // abnormal exit 
     if (failed) {

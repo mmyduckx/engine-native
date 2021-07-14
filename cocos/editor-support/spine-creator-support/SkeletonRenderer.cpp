@@ -27,18 +27,18 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-#include "spine-creator-support/SkeletonRenderer.h"
-#include <algorithm>
+#include "SkeletonRenderer.h"
 #include "MiddlewareMacro.h"
 #include "SharedBufferManager.h"
-#include "spine-creator-support/SkeletonDataMgr.h"
+#include "SkeletonDataMgr.h"
 #include "base/TypeDef.h"
 #include "base/memory/Memory.h"
-#include "gfx-base/GFXDef.h"
 #include "math/Math.h"
 #include "math/Vec3.h"
+#include "gfx-base/GFXDef.h"
 #include "spine-creator-support/AttachmentVertices.h"
 #include "spine-creator-support/spine-cocos2dx.h"
+#include <algorithm>
 
 using cc::gfx::BlendFactor;
 using cc::middleware::MiddlewareManager;

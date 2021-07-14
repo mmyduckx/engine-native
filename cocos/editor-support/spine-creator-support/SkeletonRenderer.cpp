@@ -31,7 +31,7 @@
 #include <algorithm>
 #include "MiddlewareMacro.h"
 #include "SharedBufferManager.h"
-#include "SkeletonDataMgr.h"
+#include "spine-creator-support/SkeletonDataMgr.h"
 #include "base/TypeDef.h"
 #include "base/memory/Memory.h"
 #include "gfx-base/GFXDef.h"

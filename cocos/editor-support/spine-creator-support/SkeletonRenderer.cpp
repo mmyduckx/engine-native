@@ -27,7 +27,7 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-#include "SkeletonRenderer.h"
+#include "spine-creator-support/SkeletonRenderer.h"
 #include "MiddlewareMacro.h"
 #include "SharedBufferManager.h"
 #include "SkeletonDataMgr.h"
@@ -40,13 +40,12 @@
 #include "spine-creator-support/spine-cocos2dx.h"
 #include <algorithm>
 
-using cc::gfx::BlendFactor;
-using cc::middleware::MiddlewareManager;
-using cc::middleware::V2F_T2F_C4F;
-using cc::middleware::V2F_T2F_C4F_C4F;
-using spine::SkeletonRenderer;
+USING_NS_MW;
 using std::max;
 using std::min;
+using namespace spine;
+using namespace cc;
+using namespace cc::gfx;
 
 static const std::string TECH_STAGE  = "opaque";
 static const std::string TEXTURE_KEY = "texture";
@@ -1116,3 +1115,4 @@ uint32_t SkeletonRenderer::getRenderOrder() const {
     }
     return 0;
 }
+

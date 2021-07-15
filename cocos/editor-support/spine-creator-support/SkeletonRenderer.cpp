@@ -40,12 +40,13 @@
 #include "spine-creator-support/spine-cocos2dx.h"
 #include <algorithm>
 
-USING_NS_MW;
+USING_NS_MW; // NOLINT(google-build-using-namespace)
+using namespace spine; // NOLINT(google-build-using-namespace)
+using namespace cc; // NOLINT(google-build-using-namespace)
+using namespace cc::gfx; // NOLINT(google-build-using-namespace)
+
 using std::max;
 using std::min;
-using namespace spine;
-using namespace cc;
-using namespace cc::gfx;
 
 static const std::string TECH_STAGE  = "opaque";
 static const std::string TEXTURE_KEY = "texture";
